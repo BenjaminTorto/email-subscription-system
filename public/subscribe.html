@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subscribe — Intimacy Fire Ministry</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Georgia,serif;background:#111;
+         display:flex;align-items:center;justify-content:center;
+         min-height:100vh;padding:24px}
+    .card{background:#0F0F0F;border:1px solid #2a2a2a;border-radius:16px;
+          overflow:hidden;width:100%;max-width:440px;}
+    .header{background:linear-gradient(135deg,#6B1A2B 0%,#3d0f19 100%);
+            padding:40px;text-align:center;}
+    .brand{font-size:11px;letter-spacing:4px;text-transform:uppercase;
+           color:#C9A84C;font-family:Arial,sans-serif;margin-bottom:8px;}
+    .header h1{font-size:24px;color:#fff;font-family:Georgia,serif;}
+    .header p{margin-top:8px;font-size:14px;color:#c4909a;font-family:Arial,sans-serif;}
+    .body{padding:36px 40px;}
+    label{display:block;font-size:12px;font-weight:600;color:#888;
+          margin-bottom:7px;letter-spacing:0.5px;text-transform:uppercase;
+          font-family:Arial,sans-serif;}
+    input{width:100%;padding:11px 14px;font-size:15px;
+          border:1.5px solid #2a2a2a;border-radius:8px;outline:none;
+          color:#eee;background:#1a1a1a;margin-bottom:20px;
+          font-family:Arial,sans-serif;}
+    input:focus{border-color:#6B1A2B;}
+    button{width:100%;padding:14px;background:#6B1A2B;color:#fff;
+           border:none;border-radius:8px;font-size:15px;font-weight:600;
+           cursor:pointer;font-family:Arial,sans-serif;transition:background 0.2s;}
+    button:hover{background:#5a1624;}
+    button:disabled{background:#333;color:#666;cursor:not-allowed;}
+    .privacy{margin-top:20px;padding:14px;background:#1a1a1a;
+             border-radius:8px;border:1px solid #2a2a2a;
+             font-size:12px;color:#666;line-height:1.7;
+             font-family:Arial,sans-serif;}
+    .privacy strong{color:#888;}
+    .message{margin-top:16px;padding:14px;border-radius:8px;
+             font-size:14px;font-family:Arial,sans-serif;display:none;}
+    .success{background:#0d2b1a;color:#4ade80;border:1px solid #166534;}
+    .error{background:#1f0a0d;color:#e88a9a;border:1px solid #4a1520;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="brand">🔥 &nbsp; Ministry Newsletter</div>
+      <h1>Intimacy Fire Ministry</h1>
+      <p>Pursuing God's presence with passion</p>
+    </div>
+    <div class="body">
+      <label for="full_name">Full Name</label>
+      <input type="text" id="full_name" placeholder="Your full name"/>
+
+      <label for="email">Email Address</label>
+      <input type="email" id="email" placeholder="your@email.com"/>
+
+      <button id="btn" onclick="handleSubscribe()">Subscribe →</button>
+
+      <div class="privacy">
+        🔒 <strong>Privacy Notice:</strong> Your name and email are stored securely
+        and will never be sold or shared with third parties. You can unsubscribe
+        at any time using the link in any email we send you.
+      </div>
+
+      <div class="message" id="msg"></div>
+    </div>
+  </div>
+
+  <script>
+    async function handleSubscribe() {
+      const full_name = document.getElementById('full_name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const btn = document.getElementById('btn');
+
+      if (!full_name || !email) {
+        showMsg('Please fill in all fields.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Subscribing...';
+
+      try {
+        const res = await fetch('/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name, email })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showMsg('✅ ' + data.message, 'success');
+          document.getElementById('full_name').value = '';
+          document.getElementById('email').value = '';
+        } else {
+          showMsg('❌ ' + data.error, 'error');
+        }
+      } catch (e) {
+        showMsg('Something went wrong. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Subscribe →';
+      }
+    }
+
+    function showMsg(text, type) {
+      const msg = document.getElementById('msg');
+      msg.textContent = text;
+      msg.className = 'message ' + type;
+      msg.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
